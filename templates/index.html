@@ -1,0 +1,183 @@
+{% extends "header.html" %}
+{% block title %} Home {% endblock %}
+{% block content %}
+{% load static %}
+
+<!-- Page reload -->
+<div class="container-fluid page-header py-5">
+    <h1 class="text-center text-white display-6">Welcome</h1>
+</div>
+<!-- Page reload -->
+
+
+<!-- Available Categories Start-->
+<div class="container-fluid py-5 mt-5">
+    <div class="container py-5">
+        <div class="tab-class text-center">
+        <h1 class="fw-bold mb-0">Available Categories</h1>
+            <div class="vesitable">
+                <div class="owl-carousel vegetable-carousel justify-content-center">
+                    {% for category in categories %}
+                    <div class="border border-primary rounded position-relative vesitable-item">
+                        <div class="vesitable-img">
+                            <img src="{{ category.image.url }}" class="img-fluid w-100 rounded-top" alt="">
+                        </div>
+                        <div class="text-white bg-primary px-3 py-1 rounded position-absolute" style="top: 10px; right: 10px;">{{category.name}}</div>
+                        <div class="p-4 rounded-bottom">
+                            <h4>{{ category.name }}</h4>
+                            <p>{{ category.description|truncatewords:15}}</p>
+                            <div class="d-flex justify-content-between flex-lg-wrap">
+                                <p class="text-dark fs-5 fw-bold mb-0">Visit for more...</p>
+                                <a href="" class="btn border border-secondary rounded-pill px-3 text-primary">
+                                    <i class="text-primary"></i>View</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div>
+    <hr>
+</div>
+<!-- Available Categories End -->
+
+
+<!-- Products Start-->
+<div class="container-fluid fruite py-5">
+    <div class="container py-5">
+        <div class="tab-class text-center">
+            <div id="tab-0">
+                <div class="row g-4">
+                    <div class="col-lg-4 text-start">
+                        <h1>Products from store</h1>
+                    </div>
+                    <div class="col-lg-8 text-end">
+                        <ul class="nav nav-pills d-inline-flex text-center mb-5">
+                            <li class="nav-item">
+                                <a class="d-flex m-2 py-2 bg-light rounded-pill active" data-bs-toggle="pill" href="#tab-0">
+                                    <span class="text-dark" style="width: 130px;">All Products</span>
+                                </a>
+                            </li>
+                            {% for category in categories %}
+                            <li class="nav-item">
+                                <a class="d-flex py-2 m-2 bg-light rounded-pill active" data-bs-toggle="pill" href="#tab-{{category.id}}">
+                                    <span class="text-dark" style="width: 130px;">{{ category.name }}</span>
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-content">
+                <div class="tab-pane fade show p-0 active">
+                    <div class="row g-4">
+                        <div class="col-lg-12">
+                            <div class="row g-4">
+                                {% for product in products %}
+                                <div class="col-md-6 col-lg-4 col-xl-3">
+                                    <div class="border border-primary rounded position-relative vesitable-item">
+                                        <div class="rounded position-relative fruite-item">
+                                            <div class="fruite-img">
+                                                <img src="{{  product.image.url  }}" class="img-fluid w-100 rounded-top" alt="">
+                                            </div>
+                                            <div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">{{product.category.name}}</div>
+                                            <div class="p-4 rounded-bottom">
+                                                <h4>{{product.name}}</h4>
+                                                <p>{{product.description|truncatewords:13}}</p>
+                                                <div class="d-flex justify-content-between flex-lg-wrap">
+                                                    <p class="text-dark fs-5 fw-bold mb-0">${{product.price}} / kg</p>
+                                                    <a href="product-detail/{{ product.id }}"
+                                                        class="btn border border-secondary rounded-pill px-3 text-primary">
+                                                        <i class="text-primary"></i>View</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <br>
+                <br>
+                <hr>
+                <hr>
+            </div>
+            {% for category in categories %}
+            <div id="tab-{{ category.id }}">
+                <div class="row g-4 mb-4">
+                    <div class="col-lg-4 text-start">
+                        <h1>{{category.name}}</h1>
+                    </div>
+                    <div class="col-lg-8 text-end">
+                        <ul class="nav nav-pills d-inline-flex text-center mb-5">
+                            <li class="nav-item">
+                                <a class="d-flex m-2 py-2 bg-light rounded-pill active" data-bs-toggle="pill" href="#tab-0">
+                                    <span class="text-dark" style="width: 130px;">All Products</span>
+                                </a>
+                            </li>
+                            {% for category in categories %}
+                            <li class="nav-item">
+                                <a class="d-flex py-2 m-2 bg-light rounded-pill active" data-bs-toggle="pill" href="#tab-{{category.id}}">
+                                    <span class="text-dark" style="width: 130px;">{{ category.name }}</span>
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-content">
+                <div class="tab-pane fade show p-0 active">
+                    <div class="row g-4">
+                        <div class="col-lg-12">
+                            <div class="row g-4">
+                                {% for product in products %}
+                                    {% if product.category.name == category.name %}
+                                    <div class="col-md-6 col-lg-4 col-xl-3">
+                                        <div class="border border-primary rounded position-relative vesitable-item">
+                                            <div class="rounded position-relative fruite-item">
+                                                <div class="fruite-img">
+                                                    <img src="{{  product.image.url  }}" class="img-fluid w-100 rounded-top" alt="">
+                                                </div>
+                                                <div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">{{product.category.name}}</div>
+                                                <div class="p-4 rounded-bottom">
+                                                    <h4>{{product.name}}</h4>
+                                                    <p>{{product.description|truncatewords:13}}</p>
+                                                    <div class="d-flex justify-content-between flex-lg-wrap">
+                                                        <p class="text-dark fs-5 fw-bold mb-0">${{product.price}} / kg</p>
+                                                        <a href="product-detail/{{ product.id }}"
+                                                            class="btn border border-secondary rounded-pill px-3 text-primary">
+                                                            <i class="text-primary"></i>View</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <br>
+                <br>
+                <hr>
+                <hr>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<!-- Products End-->
+
+{% endblock %}

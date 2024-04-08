@@ -1,0 +1,161 @@
+{% extends "header.html" %}
+{% block title %} Shop {% endblock %}
+{% block content %}
+{% load static %}
+
+<!-- Product Section Begin -->
+<section class="product spad">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 col-md-5">
+                <div class="sidebar">
+                    <div class="sidebar__item">
+                        <h4>Departments</h4>
+                        <ul class="list-unstyled fruite-categorie">
+                        {% for category in categories %}
+                            <li>
+                                <a href="#category-{{category.id}}">{{category.name}}</a>
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+
+                    <div class="col-lg-14">
+                        <div class="mb-3">
+                            <h4 class="mb-2">Price</h4>
+                            <input type="range" class="form-range w-100" id="rangeInput" name="rangeInput"
+                                min="0" max="100" value="50" oninput="amount.value=rangeInput.value">
+                            <output id="amount" name="amount" min-velue="0" max-value="100"
+                                for="rangeInput">50</output>
+                        </div>
+                    </div>
+
+                    <div class="column">
+                        {% for product in products %}
+                        <div class="mb-3">
+                            <div class="product-item rounded shadow-sm d-flex flex-column" style="width: 315px;">
+                                <div class="d-flex align-items-center justify-content-start">
+                                    <div class="rounded me-4" style="width: 100px; height: 100px;">
+                                        <img src="{{ product.image.url }}" class="img-fluid rounded" alt="">
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-2">{{ product.name }}</h6> <!-- Display product name dynamically -->
+                                        <div class="d-flex mb-2">
+                                            <i class="fa fa-star text-secondary"></i>
+                                            <i class="fa fa-star text-secondary"></i>
+                                            <i class="fa fa-star text-secondary"></i>
+                                            <i class="fa fa-star text-secondary"></i>
+                                            <i class="fa fa-star"></i>
+                                        </div>
+                                        <div class="d-flex mb-2">
+                                            <h5 class="fw-bold me-2">${{ product.price }}</h5> <!-- Display product price dynamically -->
+                                            <h5 class="text-danger text-decoration-line-through">${{ product.old_price }}</h5> <!-- Display old price dynamically -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-9 col-md-7">
+                <div class="product__discount">
+                    <h2>Sale Off</h2>
+                    <div class="vesitable">
+                        <div class="owl-carousel vegetable-carousel justify-content-center">
+                            {% for product in sale_products %}
+                            <div class="border border-primary rounded position-relative vesitable-item">
+                                <div class="vesitable-img">
+                                    <img src="{{  product.image.url  }}" class="img-fluid w-100 rounded-top" alt="">
+                                </div>
+                                <div class="text-white bg-danger px-3 py-1 rounded position-absolute" style="top: 10px; right: 10px;">{{product.sale_off}}%</div>
+                                <div class="p-4 rounded-bottom">
+                                    <h4>{{ product.name }}</h4>
+                                    <p>{{ product.description|truncatewords:15 }}</p>
+                                    <div class="d-flex justify-content-between flex-lg-wrap">
+                                        <a href="{% url 'product-detail' product.id %}" class="btn border border-secondary rounded-pill px-3 text-primary">
+                                            <i class="fa fa-shopping-bag me-2 text-primary"></i>View</a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="filter__item">
+                    <div class="row">
+                        <div class="col-lg-4 col-md-5">
+                            <div class="filter__sort">
+                                <span>Sort By</span>
+                                <select>
+                                    <option value="0">Default</option>
+                                    <option value="0">Default</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4">
+                            <div class="filter__found">
+                                <h6><span>999+</span> Shop Products Available </h6>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-3">
+                            <div class="filter__option">
+                                <span class="icon_grid-2x2"></span>
+                                <span class="icon_ul"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fruits Shop Start-->
+                <div class="container-fluid fruite py-5">
+                    <div class="row g-4 justify-content-center">
+                        {% for product in products %}
+                        <div class="col-md-6 col-lg-6 col-xl-4">
+                            <div class="border border-primary rounded position-relative vesitable-item">
+                                <div class="rounded position-relative fruite-item">
+                                    <div class="fruite-img">
+                                        <img src="{{  product.image.url  }}" class="img-fluid w-100 rounded-top" alt="">
+                                    </div>
+                                    <div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">
+                                        {{ product.category.name }}
+                                    </div>
+                                    <div class="p-4 rounded-bottom">
+                                        <h4>{{ product.name }}</h4>
+                                        <p class="text-dark fs-5 fw-bold mb-0">${{ product.price }} / kg</p>
+                                        <p>{{ product.description|truncatewords:10 }}</p>
+                                        <div class="d-flex justify-content-between flex-lg-wrap">
+                                            
+                                            <a href="product-detail/{{ product.id }}" class="btn border border-secondary rounded-pill px-3 text-primary">
+                                                <i class="text-primary"></i>View
+                                            </a>
+                                            <div class="d-grid justify-content-center">  <!-- Add this div for centering -->
+                                                <button data-product="{{ product.id }}" data-action="add" class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="col-12">
+                        <div class="pagination d-flex justify-content-center mt-5">
+                            <a href="#" class="rounded">&laquo;</a>
+                            <a href="#" class="active rounded">1</a>
+                            <a href="#" class="rounded">2</a>
+                            <a href="#" class="rounded">3</a>
+                            <a href="#" class="rounded">4</a>
+                            <a href="#" class="rounded">5</a>
+                            <a href="#" class="rounded">&raquo;</a>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

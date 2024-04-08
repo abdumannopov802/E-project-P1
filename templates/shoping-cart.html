@@ -1,0 +1,46 @@
+{% extends 'header.html' %}
+{% block title %} Shopping Cart {% endblock %}
+{% block content %}
+
+<!-- Cart Page Start -->
+{% if user.is_authenticated %}
+<div class="container-fluid py-5">
+    <div class="container py-5">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Products</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Quantity</th>
+                        <th scope="col">Total</th>
+                        <th scope="col">Handle</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if cart_items %}
+                        {% for item in cart_items %}
+                        <tr>
+                            <!-- Populate cart items here -->
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center">Your shopping cart is empty.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+        <!-- Rest of the cart page HTML -->
+    </div>
+</div>
+{% else %}
+<div class="container py-5">
+    <p class="text-center">Please <a href="{% url 'login' %}">login</a> to view your shopping cart.</p>
+</div>
+{% endif %}
+<!-- Cart Page End -->
+
+{% endblock %}
