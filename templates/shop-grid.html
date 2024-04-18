@@ -59,13 +59,16 @@
             <div class="col-lg-3 col-md-5">
                 <div class="sidebar">
                     <div class="sidebar__item">
-                        <h4>Departments</h4>
+                        <h4>Categories</h4>
                         <ul class="list-unstyled fruite-categorie">
-                        {% for category in categories %}
                             <li>
-                                <a href="#category-{{category.id}}">{{category.name}}</a>
+                                <a href="{% url 'shop-grid' %}"> All products </a>
                             </li>
-                        {% endfor %}
+                            {% for category in categories %}
+                                <li>
+                                    <a href="{% url 'shop-grid-pk' category.id %}"> {{ category.name}} </a>
+                                </li>
+                            {% endfor %}
                         </ul>
                     </div>
 
@@ -80,7 +83,7 @@
                     </div>
 
                     <div class="column">
-                        {% for product in products %}
+                        {% for product in all_products %}
                         <div class="mb-3">
                             <div class="product-item rounded shadow-sm d-flex flex-column" style="width: 315px;">
                                 <div class="d-flex align-items-center justify-content-start">
@@ -119,6 +122,8 @@
                 </div>
             </div>
             <div class="col-lg-9 col-md-7">
+                {% if search_products %}
+                {% else %}
                 <div class="product__discount">
                     <h2>Sale Off</h2>
                     <div class="vesitable">
@@ -142,6 +147,7 @@
                         </div>
                     </div>
                 </div>
+                {% endif %}
                 <div class="filter__item">
                     <div class="row">
                         <div class="col-lg-4 col-md-5">
@@ -155,7 +161,7 @@
                         </div>
                         <div class="col-lg-4 col-md-4">
                             <div class="filter__found">
-                                <h6><span></span> Our Store's Available Products </h6>
+                                <h6><span></span> Available Products </h6>
                             </div>
                         </div>
                         <div class="col-lg-4 col-md-3">
@@ -170,31 +176,59 @@
                 <!-- Fruits Shop Start-->
                 <div class="container-fluid fruite py-5">
                     <div class="row g-4 justify-content-center">
-                        {% for product in products %}
-                        <div class="col-md-6 col-lg-6 col-xl-4">
-                            <div class="border border-primary rounded position-relative vesitable-item">
-                                <div class="rounded position-relative fruite-item">
-                                    <div class="fruite-img">
-                                        <img src="{{  product.image.url  }}" class="img-fluid w-100 rounded-top" alt="">
-                                    </div>
-                                    <div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">
-                                        {{ product.category.name }}
-                                    </div>
-                                    <div class="p-4 rounded-bottom">
-                                        <h4>{{ product.name }}</h4>
-                                        <p class="text-dark fs-5 fw-bold mb-0">${{ product.price }} / kg</p>
-                                        <p>{{ product.description|truncatewords:10 }}</p>
-                                        <div class="d-flex justify-content-between flex-lg-wrap">
-                                            
-                                            <a href="product-detail/{{ product.id }}" class="btn border border-secondary rounded-pill px-3 text-primary">
-                                                <i class="fa fa-shopping-bag me-2 text-primary"></i>Add to cart
-                                            </a>
+                        {% if search_products %}
+                            {% for product in search_products %}
+                            <div class="col-md-6 col-lg-6 col-xl-4">
+                                <div class="border border-primary rounded position-relative vesitable-item">
+                                    <div class="rounded position-relative fruite-item">
+                                        <div class="fruite-img">
+                                            <img src="{{  product.image.url  }}" class="img-fluid w-100 rounded-top" alt="">
+                                        </div>
+                                        <div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">
+                                            {{ product.category.name }}
+                                        </div>
+                                        <div class="p-4 rounded-bottom">
+                                            <h4>{{ product.name }}</h4>
+                                            <p class="text-dark fs-5 fw-bold mb-0">${{ product.price }} / kg</p>
+                                            <p>{{ product.description|truncatewords:10 }}</p>
+                                            <div class="d-flex justify-content-between flex-lg-wrap">
+                                                
+                                                <a href="{% url 'product-detail' product.id %}" class="btn border border-secondary rounded-pill px-3 text-primary">
+                                                    <i class="fa fa-shopping-bag me-2 text-primary"></i>Add to cart
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        {% endfor %}
+                            {% endfor %}
+                        {% else %}
+                            {% for product in all_products %}
+                            <div class="col-md-6 col-lg-6 col-xl-4">
+                                <div class="border border-primary rounded position-relative vesitable-item">
+                                    <div class="rounded position-relative fruite-item">
+                                        <div class="fruite-img">
+                                            <img src="{{  product.image.url  }}" class="img-fluid w-100 rounded-top" alt="">
+                                        </div>
+                                        <div class="text-white bg-secondary px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">
+                                            {{ product.category.name }}
+                                        </div>
+                                        <div class="p-4 rounded-bottom">
+                                            <h4>{{ product.name }}</h4>
+                                            <p class="text-dark fs-5 fw-bold mb-0">${{ product.price }} / kg</p>
+                                            <p>{{ product.description|truncatewords:10 }}</p>
+                                            <div class="d-flex justify-content-between flex-lg-wrap">
+                                                
+                                                <a href="{% url 'product-detail' product.id %}" class="btn border border-secondary rounded-pill px-3 text-primary">
+                                                    <i class="fa fa-shopping-bag me-2 text-primary"></i>Add to cart
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% endif %}
                         <div class="col-12">
                             <div class="pagination d-flex justify-content-center mt-5">
                                 <a href="#" id="return-to-top" class="rounded">&uarr;</a>

@@ -38,4 +38,8 @@ class OrderItemAdmin(admin.ModelAdmin):
     list_filter = ('id', 'product', 'order', 'quantity', 'date_added')
     search_fields = ('id', 'product', 'order', 'quantity', 'date_added')
 
-admin.site.register(PurchaseHistory)
+@admin.register(PurchaseHistory)
+class CostumerPurchaseHistory(admin.ModelAdmin):
+    list_display = ('customer', 'product', 'quantity', 'purchase_date')
+    list_filter = ('customer', 'product', 'quantity', 'purchase_date')
+    search_fields = ('customer', 'product', 'quantity', 'purchase_date')

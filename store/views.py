@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, get_list_or_404
 from .models import *
 from .forms import *
 from django.core.mail import send_mail
@@ -89,7 +89,6 @@ def product_detail(request, pk):
 
 def shop_grid(request):
     if request.method == 'GET':
-        category_name = request.GET.get('category')
         products = Product.objects.all()
         categories = Category.objects.all()
         count=0
@@ -97,13 +96,20 @@ def shop_grid(request):
         total_sum = sum(item.get_total for item in user_cart_items)
         quantity = sum(count+1 for _ in user_cart_items)
         sale_products = []
-        search_products = []
         for product in products:
             if product.sale_off:
                 sale_products.append(product)
-            if product.category == category_name:
-                search_products.append(product)
-    return render(request, 'shop-grid.html', {'sale_products': sale_products, 'categories': categories, 'search_products': search_products, 'products': products, 'total_sum': total_sum, 'quantity': quantity})
+    return render(request, 'shop-grid.html', {'sale_products': sale_products, 'categories': categories, 'all_products': products, 'total_sum': total_sum, 'quantity': quantity})
+
+def shop_grid_pk(request, pk):
+    if request.method == 'GET':
+        search_products = get_list_or_404(Product, category=pk)
+        products = Product.objects.all()
+        categories = Category.objects.all()
+        user_cart_items = OrderItem.objects.filter(order__customer=request.user.customer, order__complete=False)
+        total_sum = sum(item.get_total for item in user_cart_items)
+        quantity = len(user_cart_items)
+    return render(request, 'shop-grid.html', {'categories': categories, 'search_products': search_products, 'all_products': search_products, 'total_sum': total_sum, 'quantity': quantity})
 
 def shopping_cart(request):
     if request.user.is_authenticated:
