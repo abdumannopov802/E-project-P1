@@ -70,7 +70,7 @@ class Order(models.Model):
 
 class OrderItem(models.Model):
 	product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
-	order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
+	order = models.ForeignKey(Order, related_name='order_item', on_delete=models.SET_NULL, null=True)
 	quantity = models.IntegerField(default=0, null=True, blank=True)
 	date_added = models.DateTimeField(auto_now_add=True)
 
@@ -90,6 +90,12 @@ class ShippingAddress(models.Model):
 
 	def __str__(self):
 		return self.address
+	
+class PurchaseHistory(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+    quantity = models.PositiveIntegerField()
+    purchase_date = models.DateField(auto_now_add=True)
 
 ###
 def create_customer_for_user(sender, instance, created, **kwargs):

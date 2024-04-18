@@ -3,6 +3,55 @@
 {% block content %}
 {% load static %}
 
+ <!-- Header Bottom Section -->
+ <div class="container">
+    <div class="row align-items-center">
+        <!-- Logo Section -->
+        <div class="col-lg-3">
+            <div class="header__logo">
+                <a href="{% url 'home' %}"><img src="{% static 'img/logo.png' %}" alt=""></a>
+            </div>
+        </div>
+        <!-- Navigation Section -->
+        <div class="col-lg-6">
+            <nav class="header__menu">
+                <ul class="list-unstyled d-flex justify-content-center">
+                    <li class="{% if request.path == '/' %}active{% endif %}"><a href="{% url 'home' %}">Home</a></li>
+                    <li class="{% if request.path == '/shop-grid' %}active{% endif %}"><a href="{% url 'shop-grid' %}">Shop</a></li>
+                    <li class="{% if request.path == '/shopping-cart' %}active{% endif %}"><a href="{% url 'shopping-cart' %}">My Cart</a></li>
+                    <li class="{% if request.path == '/contact' %}active{% endif %}"><a href="{% url 'contact' %}">Contact</a></li>
+                    <li class="{% if request.path == '/checkout' %}active{% endif %}"><a href="{% url 'checkout' %}">Check Out</a></li>
+                </ul>
+            </nav>
+        </div>
+        <!-- Cart Section -->
+        <div class="col-lg-3">
+            <div class="header__cart d-flex justify-content-end align-items-center">
+                <a href="{% if user.is_authenticated %}{% url 'shopping-cart' %}{% else %}{% url 'login' %}?next={% url 'shopping-cart' %}{% endif %}" class="text-decoration-none me-4">
+                    <i class="fa fa-shopping-bag me-2"></i> 
+                    <span>{% if user.is_authenticated %}{{ quantity }}{% else %}0{% endif %}</span>
+                </a>
+                <div class="header__cart__price">
+                    Total:
+                    <span>
+                        {% if user.is_authenticated %}
+                            $ {{ total_sum }}
+                        {% else %}
+                            $0.00
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Mobile Menu Icon -->
+<div class="humberger__open">
+    <i class="fa fa-bars"></i>
+</div>
+</header>
+<!-- Header Section End -->
+
 <!-- Single Product Start -->
 <div class="container-fluid py-5 mt-5">
     <div class="container py-5">
@@ -17,9 +66,9 @@
                         </div>
                     </div>
                     <div class="col-lg-6">
-                        <h4 class="fw-bold mb-3">{{product.name}}</h4>
-                        <p class="mb-3">Category: {{product.category.name}}</p>
-                        <h5 class="fw-bold mb-3"> $ {{product.price}}</h5>
+                        <h4 class="fw-bold mb-3">{{ product.name }}</h4>
+                        <p class="mb-3">Category: {{ product.category.name }}</p>
+                        <h5 class="fw-bold mb-3"> $ {{ product.price }}</h5>
                         <div class="d-flex mb-4">
                             <i class="fa fa-star text-secondary"></i>
                             <i class="fa fa-star text-secondary"></i>
@@ -28,22 +77,28 @@
                             <i class="fa fa-star"></i>
                         </div>
                         <p class="mb-4"></p>
-                        <div class="input-group quantity mb-5" style="width: 100px;">
-                            <div class="input-group-btn">
-                                <button class="btn btn-sm btn-minus rounded-circle bg-light border">
-                                    <i class="fa fa-minus"></i>
-                                </button>
+                        <!-- Form for adding to cart -->
+                        <form method="post" action="{% url 'product-detail' product.id %}">
+                            {% csrf_token %}
+                            <div class="input-group quantity mb-5" style="width: 100px;">
+                                <div class="input-group-btn">
+                                    <button class="btn btn-sm btn-minus rounded-circle bg-light border" type="button">
+                                        <i class="fa fa-minus"></i>
+                                    </button>
+                                </div>
+                                <input type="number" class="form-control form-control-sm text-center border-0" name="quantity" value="1" min="1">
+                                <div class="input-group-btn">
+                                    <button class="btn btn-sm btn-plus rounded-circle bg-light border" type="button">
+                                        <i class="fa fa-plus"></i>
+                                    </button>
+                                </div>
                             </div>
-                            <input type="text" class="form-control form-control-sm text-center border-0" value="1">
-                            <div class="input-group-btn">
-                                <button class="btn btn-sm btn-plus rounded-circle bg-light border">
-                                    <i class="fa fa-plus"></i>
-                                </button>
-                            </div>
-                        </div>
+                            <!-- Add to cart button -->
+                            <button type="submit" class="btn border border-secondary rounded-pill px-4 py-2 mb-4 text-primary">
+                                <i class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart
+                            </button>
+                        </form>
                     </div>
-                    <a href="#" class="btn border border-secondary rounded-pill px-4 py-2 mb-4 text-primary"><i
-                        class="fa fa-shopping-bag me-2 text-primary"></i> Add to cart</a>
                 </div>
             </div>
             <div class="col-lg-4 col-xl-3">
@@ -52,8 +107,7 @@
                         <div class="px-2">
                             <div class="row g-4">
                                 <div class="col-10 offset-3">
-                                    <div
-                                        class="row bg-light align-items-center justify-content-center py-2">
+                                    <div class="row bg-light align-items-center justify-content-center py-2">
                                         <p class="mb-0">{{ product.description }}</p>
                                     </div>
                                 </div>
@@ -63,23 +117,24 @@
                 </div>
             </div>
         </div>
-            <div class="tab-class text-center">
+        <div class="tab-class text-center">
             <h1 class="fw-bold mb-0">Related products</h1>
             <div class="vesitable">
                 <div class="owl-carousel vegetable-carousel justify-content-center">
                     {% for product in related_products %}
                     <div class="border border-primary rounded position-relative vesitable-item">
                         <div class="vesitable-img">
-                            <img src="{{  product.image.url  }}" class="img-fluid w-100 rounded-top" alt="">
+                            <img src="{{ product.image.url }}" class="img-fluid w-100 rounded-top" alt="">
                         </div>
-                        <div class="text-white bg-primary px-3 py-1 rounded position-absolute" style="top: 10px; right: 10px;">{{category_name}}</div>
+                        <div class="text-white bg-primary px-3 py-1 rounded position-absolute" style="top: 10px; right: 10px;">{{ category_name }}</div>
                         <div class="p-4 rounded-bottom">
                             <h4>{{ product.name }}</h4>
                             <p>{{ product.description|truncatewords:13 }}</p>
                             <div class="d-flex justify-content-between flex-lg-wrap">
                                 <p class="text-dark fs-5 fw-bold mb-0">$ {{ product.price }}</p>
                                 <a href="{% url 'product-detail' product.id %}" class="btn border border-secondary rounded-pill px-3 text-primary">
-                                    <i class="text-primary"></i>View</a>
+                                    <i class="text-primary"></i> View
+                                </a>
                             </div>
                         </div>
                     </div>

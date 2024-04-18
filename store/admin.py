@@ -37,3 +37,5 @@ class OrderItemAdmin(admin.ModelAdmin):
     list_display = ('id', 'product', 'order', 'quantity', 'date_added')
     list_filter = ('id', 'product', 'order', 'quantity', 'date_added')
     search_fields = ('id', 'product', 'order', 'quantity', 'date_added')
+
+admin.site.register(PurchaseHistory)

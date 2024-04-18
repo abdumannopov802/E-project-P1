@@ -3,18 +3,66 @@
 {% block content %}
 {% load static %}
 
+ <!-- Header Bottom Section -->
+ <div class="container">
+    <div class="row align-items-center">
+        <!-- Logo Section -->
+        <div class="col-lg-3">
+            <div class="header__logo">
+                <a href="{% url 'home' %}"><img src="{% static 'img/logo.png' %}" alt=""></a>
+            </div>
+        </div>
+        <!-- Navigation Section -->
+        <div class="col-lg-6">
+            <nav class="header__menu">
+                <ul class="list-unstyled d-flex justify-content-center">
+                    <li class="{% if request.path == '/' %}active{% endif %}"><a href="{% url 'home' %}">Home</a></li>
+                    <li class="{% if request.path == '/shop-grid' %}active{% endif %}"><a href="{% url 'shop-grid' %}">Shop</a></li>
+                    <li class="{% if request.path == '/shopping-cart' %}active{% endif %}"><a href="{% url 'shopping-cart' %}">My Cart</a></li>
+                    <li class="{% if request.path == '/contact' %}active{% endif %}"><a href="{% url 'contact' %}">Contact</a></li>
+                    <li class="{% if request.path == '/checkout' %}active{% endif %}"><a href="{% url 'checkout' %}">Check Out</a></li>
+                </ul>
+            </nav>
+        </div>
+        <!-- Cart Section -->
+        <div class="col-lg-3">
+            <div class="header__cart d-flex justify-content-end align-items-center">
+                <a href="{% if user.is_authenticated %}{% url 'shopping-cart' %}{% else %}{% url 'login' %}?next={% url 'shopping-cart' %}{% endif %}" class="text-decoration-none me-4">
+                    <i class="fa fa-shopping-bag me-2"></i> 
+                    <span>{% if user.is_authenticated %}{{ quantity }}{% else %}0{% endif %}</span>
+                </a>
+                <div class="header__cart__price">
+                    Total:
+                    <span>
+                        {% if user.is_authenticated %}
+                            $ {{ total_sum }}
+                        {% else %}
+                            $0.00
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Mobile Menu Icon -->
+<div class="humberger__open">
+    <i class="fa fa-bars"></i>
+</div>
+</header>
+<!-- Header Section End -->
+
 <!-- Page reload -->
 <div class="container-fluid page-header py-5">
-    <h1 class="text-center text-white display-6">Welcome</h1>
+    <h1 class="text-center text-white display-5">Welcome</h1>
 </div>
 <!-- Page reload -->
-
 
 <!-- Available Categories Start-->
 <div class="container-fluid py-5 mt-5">
     <div class="container py-5">
-        <div class="tab-class text-center">
         <h1 class="fw-bold mb-0">Available Categories</h1>
+        <div class="tab-class text-center">
             <div class="vesitable">
                 <div class="owl-carousel vegetable-carousel justify-content-center">
                     {% for category in categories %}
@@ -28,7 +76,7 @@
                             <p>{{ category.description|truncatewords:15}}</p>
                             <div class="d-flex justify-content-between flex-lg-wrap">
                                 <p class="text-dark fs-5 fw-bold mb-0">Visit for more...</p>
-                                <a href="" class="btn border border-secondary rounded-pill px-3 text-primary">
+                                <a href="#tab-{{category.id}}" class="btn border border-secondary rounded-pill px-3 text-primary">
                                     <i class="text-primary"></i>View</a>
                             </div>
                         </div>
@@ -175,6 +223,11 @@
                 <hr>
             </div>
             {% endfor %}
+        </div>
+        <div class="col-12">
+            <div class="pagination d-flex justify-content-center mt-5">
+                <a href="#" id="return-to-top" class="rounded">&uarr;</a>
+            </div>
         </div>
     </div>
 </div>

@@ -5,64 +5,115 @@ from django.core.mail import send_mail
 import logging
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseBadRequest
 
 def checkout(request):
-    return render(request, 'checkout.html', {})
+    if request.method == 'GET':
+        user_cart_items = OrderItem.objects.filter(order__customer=request.user.customer, order__complete=False)
+        total_sum = sum(item.get_total for item in user_cart_items)
+        quantity = len(user_cart_items)
+        context = [{'item_name': item.product.name, 'item_total': item.product.price * item.quantity} for item in user_cart_items]
+        return render(request, 'checkout.html', {'total_sum': total_sum, 'context': context, 'quantity': quantity})
+    elif request.method == 'POST':
+        user_cart_items = OrderItem.objects.filter(order__customer=request.user.customer, order__complete=False)
+        if user_cart_items:
+            for item in user_cart_items:
+                PurchaseHistory.objects.create(customer=request.user.customer, product=item.product, quantity=item.quantity)
+            user_cart_items.delete()
+            message_success = "Your order was ACTIVATED successfully!"
+            return render(request, 'checkout.html', {'message_success': message_success})
+        else:
+            message_fail = "Your cart is empty!"
+            return render(request, 'checkout.html', {'message_fail': message_fail})
+    else:
+        return HttpResponseBadRequest("Only GET and POST requests are supported for this endpoint.")
+
 
 def contact(request):
+    count=0
+    user_cart_items = OrderItem.objects.filter(order__customer=request.user.customer, order__complete=False)
+    total_sum = sum(item.get_total for item in user_cart_items)
+    quantity = sum(count+1 for _ in user_cart_items)
     if request.method == 'POST':
         subject = request.POST.get("subject")
         message = request.POST.get("message")
         from_email = request.POST.get("from_email")
         if subject and message and from_email:
             try:
-                send_mail(subject, message, from_email, ["akromabdumannopov815@example.com"])
-                return render(request, 'contact.html', {'success': True})
+                send_mail(subject, message, from_email, ["akromabdumannopov802@gmail.com"])
+                return render(request, 'contact.html', {'success': True, 'total_sum': total_sum, 'quantity': quantity})
             except Exception as error:
                 logging.error(error)
-                return render(request, 'contact.html', {'error': True})
+                return render(request, 'contact.html', {'error': True, 'total_sum': total_sum, 'quantity': quantity})
         else:
-            return render(request, 'contact.html', {'error': True})
+            return render(request, 'contact.html', {'error': True, 'total_sum': total_sum, 'quantity': quantity})
     else:
-        return render(request, 'contact.html', {})
+        return render(request, 'contact.html', {'total_sum': total_sum, 'quantity': quantity})
 
 def index(request):
-    count = 0
-    products = []
-    all_products = Product.objects.all()
-    categories = Category.objects.all()
-    return render(request, 'index.html', {'products': all_products, 'categories': categories, 'related_products': all_products})
+    if request.user.is_authenticated:
+        count = 0
+        products = []
+        user_cart_items = OrderItem.objects.filter(order__customer=request.user.customer, order__complete=False)
+        total_sum = sum(item.get_total for item in user_cart_items)
+        quantity = sum(count+1 for _ in user_cart_items)
+        all_products = Product.objects.all()
+        categories = Category.objects.all()
+    else:
+        return redirect('login')
+    return render(request, 'index.html', {'products': all_products, 'categories': categories, 'related_products': all_products, 'total_sum': total_sum, 'quantity': quantity})
 
 def product_detail(request, pk):
-    product_instace = get_object_or_404(Product, id=pk)
-    all_Products = Product.objects.all()
-    related_products = []
-    for product in all_Products:
-        if product.category.id == product_instace.category.id:
-            related_products.append(product)
-    category_name = product.category.name
-    return render(request, 'product-detail.html', {'product': product, 'related_products': related_products, 'category_name': category_name})
+    if request.method == "POST":
+        quantity = int(request.POST.get('quantity', 1))
+        product = get_object_or_404(Product, pk=pk)
+        order, created = Order.objects.get_or_create(customer=request.user.customer, complete=False)
 
-def shop_details(request):
-    return render(request, 'shop-details.html', {})
+        order_item, created = OrderItem.objects.get_or_create(order=order, product=product)
+        order_item.quantity += quantity
+        order_item.save()
+
+        return redirect('product-detail', pk=pk)
+
+    product_instance = get_object_or_404(Product, pk=pk)
+    all_products = Product.objects.all()
+    related_products = [product for product in all_products if product.category.id == product_instance.category.id]
+    category_name = product_instance.category.name
+
+    count=0
+    user_cart_items = OrderItem.objects.filter(order__customer=request.user.customer, order__complete=False)
+    total_sum = sum(item.get_total for item in user_cart_items)
+    quantity = sum(count+1 for _ in user_cart_items)
+    return render(request, 'product-detail.html', {'product': product_instance, 'related_products': related_products, 'category_name': category_name, 'total_sum': total_sum, 'quantity': quantity})
 
 def shop_grid(request):
-    products = Product.objects.all()
-    categories = Category.objects.all()
-    sale_products = []
-    for product in products:
-        if product.sale_off:
-            sale_products.append(product)
-    return render(request, 'shop-grid.html', {'sale_products': sale_products, 'categories': categories,})
+    if request.method == 'GET':
+        category_name = request.GET.get('category')
+        products = Product.objects.all()
+        categories = Category.objects.all()
+        count=0
+        user_cart_items = OrderItem.objects.filter(order__customer=request.user.customer, order__complete=False)
+        total_sum = sum(item.get_total for item in user_cart_items)
+        quantity = sum(count+1 for _ in user_cart_items)
+        sale_products = []
+        search_products = []
+        for product in products:
+            if product.sale_off:
+                sale_products.append(product)
+            if product.category == category_name:
+                search_products.append(product)
+    return render(request, 'shop-grid.html', {'sale_products': sale_products, 'categories': categories, 'search_products': search_products, 'products': products, 'total_sum': total_sum, 'quantity': quantity})
 
 def shopping_cart(request):
     if request.user.is_authenticated:
-        # Fetch the current user's cart items
-        user_cart_items = Order.objects.filter(customer=request.user.customer, complete=False)
-        context = {'cart_items': user_cart_items}
+        count=0
+        user_cart_items = OrderItem.objects.filter(order__customer=request.user.customer, order__complete=False)
+        total_sum = sum(item.get_total for item in user_cart_items)
+        quantity = sum(count+1 for _ in user_cart_items)
+        context = {'cart_items': user_cart_items, 'total_sum': total_sum, 'quantity': quantity}
     else:
-        context = {'cart_items': None}  # No cart items for non-authenticated users
-
+        context = {'cart_items': None}
     return render(request, 'shoping-cart.html', context)
 
 
@@ -109,4 +160,21 @@ def signup_view(request):
 
 def user_logout(request):
     logout(request)
-    return redirect('home')
+    return redirect('login')
+
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import Product
+
+def add_to_cart(request, product_id):
+    if request.method == 'POST':
+        quantity = request.POST.get('quantity')
+        product = Product.objects.get(pk=product_id)
+        # Perform your logic to add the product to the cart
+        messages.success(request, 'Product added to cart successfully.')
+    return redirect('product-detail', pk=product_id)
+
+def remove_from_cart(request, pk):
+    item = get_object_or_404(OrderItem, id=pk)
+    item.delete()
+    return redirect('shopping-cart')

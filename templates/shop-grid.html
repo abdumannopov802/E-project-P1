@@ -3,6 +3,55 @@
 {% block content %}
 {% load static %}
 
+ <!-- Header Bottom Section -->
+ <div class="container">
+    <div class="row align-items-center">
+        <!-- Logo Section -->
+        <div class="col-lg-3">
+            <div class="header__logo">
+                <a href="{% url 'home' %}"><img src="{% static 'img/logo.png' %}" alt=""></a>
+            </div>
+        </div>
+        <!-- Navigation Section -->
+        <div class="col-lg-6">
+            <nav class="header__menu">
+                <ul class="list-unstyled d-flex justify-content-center">
+                    <li class="{% if request.path == '/' %}active{% endif %}"><a href="{% url 'home' %}">Home</a></li>
+                    <li class="{% if request.path == '/shop-grid' %}active{% endif %}"><a href="{% url 'shop-grid' %}">Shop</a></li>
+                    <li class="{% if request.path == '/shopping-cart' %}active{% endif %}"><a href="{% url 'shopping-cart' %}">My Cart</a></li>
+                    <li class="{% if request.path == '/contact' %}active{% endif %}"><a href="{% url 'contact' %}">Contact</a></li>
+                    <li class="{% if request.path == '/checkout' %}active{% endif %}"><a href="{% url 'checkout' %}">Check Out</a></li>
+                </ul>
+            </nav>
+        </div>
+        <!-- Cart Section -->
+        <div class="col-lg-3">
+            <div class="header__cart d-flex justify-content-end align-items-center">
+                <a href="{% if user.is_authenticated %}{% url 'shopping-cart' %}{% else %}{% url 'login' %}?next={% url 'shopping-cart' %}{% endif %}" class="text-decoration-none me-4">
+                    <i class="fa fa-shopping-bag me-2"></i> 
+                    <span>{% if user.is_authenticated %}{{ quantity }}{% else %}0{% endif %}</span>
+                </a>
+                <div class="header__cart__price">
+                    Total:
+                    <span>
+                        {% if user.is_authenticated %}
+                            $ {{ total_sum }}
+                        {% else %}
+                            $0.00
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Mobile Menu Icon -->
+<div class="humberger__open">
+    <i class="fa fa-bars"></i>
+</div>
+</header>
+<!-- Header Section End -->
+
 <!-- Product Section Begin -->
 <section class="product spad">
     <div class="container">
@@ -41,15 +90,25 @@
                                     <div>
                                         <h6 class="mb-2">{{ product.name }}</h6> <!-- Display product name dynamically -->
                                         <div class="d-flex mb-2">
-                                            <i class="fa fa-star text-secondary"></i>
-                                            <i class="fa fa-star text-secondary"></i>
-                                            <i class="fa fa-star text-secondary"></i>
-                                            <i class="fa fa-star text-secondary"></i>
-                                            <i class="fa fa-star"></i>
+                                            {% if product.sale_off %}
+                                                <i class="fa fa-star text-secondary"></i>
+                                                <i class="fa fa-star text-secondary"></i>
+                                                <i class="fa fa-star text-secondary"></i>
+                                                <i class="fa fa-star text-secondary"></i>
+                                                <i class="fa fa-star text-secondary"></i>
+                                            {% else %}
+                                                <i class="fa fa-star text-secondary"></i>
+                                                <i class="fa fa-star text-secondary"></i>
+                                                <i class="fa fa-star text-secondary"></i>
+                                                <i class="fa fa-star text-secondary"></i>
+                                                <i class="fa fa-star"></i>
+                                            {% endif %}
                                         </div>
                                         <div class="d-flex mb-2">
                                             <h5 class="fw-bold me-2">${{ product.price }}</h5> <!-- Display product price dynamically -->
-                                            <h5 class="text-danger text-decoration-line-through">${{ product.old_price }}</h5> <!-- Display old price dynamically -->
+                                            {% if product.sale_off %}
+                                            <h5 class="text-danger">{{ product.sale_off}}% sale</h5> <!-- Display old price dynamically -->
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
@@ -75,7 +134,7 @@
                                     <p>{{ product.description|truncatewords:15 }}</p>
                                     <div class="d-flex justify-content-between flex-lg-wrap">
                                         <a href="{% url 'product-detail' product.id %}" class="btn border border-secondary rounded-pill px-3 text-primary">
-                                            <i class="fa fa-shopping-bag me-2 text-primary"></i>View</a>
+                                            <i class="fa fa-shopping-bag me-2 text-primary"></i>Add to cart</a>
                                     </div>
                                 </div>
                             </div>
@@ -87,16 +146,16 @@
                     <div class="row">
                         <div class="col-lg-4 col-md-5">
                             <div class="filter__sort">
-                                <span>Sort By</span>
-                                <select>
-                                    <option value="0">Default</option>
-                                    <option value="0">Default</option>
+                                <select id="sort-by-select">
+                                    {% comment %} <option value="price-desc">Price: High to Low</option>
+                                    <option value="price-asc">Price: Low to High</option> {% endcomment %}
+                                    <option value="default">Price: Mixed</option>
                                 </select>
                             </div>
                         </div>
                         <div class="col-lg-4 col-md-4">
                             <div class="filter__found">
-                                <h6><span>999+</span> Shop Products Available </h6>
+                                <h6><span></span> Our Store's Available Products </h6>
                             </div>
                         </div>
                         <div class="col-lg-4 col-md-3">
@@ -128,31 +187,21 @@
                                         <div class="d-flex justify-content-between flex-lg-wrap">
                                             
                                             <a href="product-detail/{{ product.id }}" class="btn border border-secondary rounded-pill px-3 text-primary">
-                                                <i class="text-primary"></i>View
+                                                <i class="fa fa-shopping-bag me-2 text-primary"></i>Add to cart
                                             </a>
-                                            <div class="d-grid justify-content-center">  <!-- Add this div for centering -->
-                                                <button data-product="{{ product.id }}" data-action="add" class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         {% endfor %}
-                    </div>
-                    <div class="col-12">
-                        <div class="pagination d-flex justify-content-center mt-5">
-                            <a href="#" class="rounded">&laquo;</a>
-                            <a href="#" class="active rounded">1</a>
-                            <a href="#" class="rounded">2</a>
-                            <a href="#" class="rounded">3</a>
-                            <a href="#" class="rounded">4</a>
-                            <a href="#" class="rounded">5</a>
-                            <a href="#" class="rounded">&raquo;</a>
+                        <div class="col-12">
+                            <div class="pagination d-flex justify-content-center mt-5">
+                                <a href="#" id="return-to-top" class="rounded">&uarr;</a>
+                            </div>
                         </div>
                     </div>
                 </div>
-                
             </div>
         </div>
     </div>

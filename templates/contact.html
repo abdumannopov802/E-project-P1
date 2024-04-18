@@ -3,6 +3,55 @@
 {% block content %}
 {% load static %}
 
+ <!-- Header Bottom Section -->
+ <div class="container">
+    <div class="row align-items-center">
+        <!-- Logo Section -->
+        <div class="col-lg-3">
+            <div class="header__logo">
+                <a href="{% url 'home' %}"><img src="{% static 'img/logo.png' %}" alt=""></a>
+            </div>
+        </div>
+        <!-- Navigation Section -->
+        <div class="col-lg-6">
+            <nav class="header__menu">
+                <ul class="list-unstyled d-flex justify-content-center">
+                    <li class="{% if request.path == '/' %}active{% endif %}"><a href="{% url 'home' %}">Home</a></li>
+                    <li class="{% if request.path == '/shop-grid' %}active{% endif %}"><a href="{% url 'shop-grid' %}">Shop</a></li>
+                    <li class="{% if request.path == '/shopping-cart' %}active{% endif %}"><a href="{% url 'shopping-cart' %}">My Cart</a></li>
+                    <li class="{% if request.path == '/contact' %}active{% endif %}"><a href="{% url 'contact' %}">Contact</a></li>
+                    <li class="{% if request.path == '/checkout' %}active{% endif %}"><a href="{% url 'checkout' %}">Check Out</a></li>
+                </ul>
+            </nav>
+        </div>
+        <!-- Cart Section -->
+        <div class="col-lg-3">
+            <div class="header__cart d-flex justify-content-end align-items-center">
+                <a href="{% if user.is_authenticated %}{% url 'shopping-cart' %}{% else %}{% url 'login' %}?next={% url 'shopping-cart' %}{% endif %}" class="text-decoration-none me-4">
+                    <i class="fa fa-shopping-bag me-2"></i> 
+                    <span>{% if user.is_authenticated %}{{ quantity }}{% else %}0{% endif %}</span>
+                </a>
+                <div class="header__cart__price">
+                    Total:
+                    <span>
+                        {% if user.is_authenticated %}
+                            $ {{ total_sum }}
+                        {% else %}
+                            $0.00
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Mobile Menu Icon -->
+<div class="humberger__open">
+    <i class="fa fa-bars"></i>
+</div>
+</header>
+<!-- Header Section End -->
+
 <!-- Page reload -->
 <div class="container-fluid page-header py-5">
     <h1 class="text-center text-white display-6">Contact Us</h1>

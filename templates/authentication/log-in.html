@@ -1,6 +1,6 @@
 {% load static %}
 <section>
-    <link rel="stylesheet" type="text/css" href="{% static 'css/loginCSS/login.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/login.css' %}">
     <div class="colour"></div>
     <div class="colour"></div>
     <div class="colour"></div>
@@ -12,23 +12,23 @@
         <div class="square" style="--i: 4"></div>
         <div class="container">
             <div class="form">
-                <h2>Login Form</h2>
+                <h2 style="color: green;">Login Form</h2>
                 <form method="post" action="{% url 'login' %}">
                     {% csrf_token %}
                     <div class="input__box">
-                        <input type="text" name="username" placeholder="Username" required />
+                        <input style="color: black;" type="text" name="username" placeholder="Username" required />
                     </div>
                     <div class="input__box">
-                        <input type="password" name="password" placeholder="Password" required />
+                        <input style="color: black;" type="password" name="password" placeholder="Password" required />
                     </div>
                     <div class="input__box">
-                        <input type="submit" value="Login" />
+                        <input style="color: black;" type="submit" value="Login" />
                     </div>
-                    <p class="forget">
+                    {% comment %} <p class="forget">
                         Forgot Password? <a href="#">Click Here</a>
-                    </p>
-                    <p class="forget">
-                        Don't have an account? <a href="{% url 'signup' %}">Sign Up</a>
+                    </p> {% endcomment %}
+                    <p style="color: black;" class="forget">
+                        Don't have an account? <a style="color: blue;" href="{% url 'signup' %}">Sign Up</a>
                     </p>
                 </form>
             </div>

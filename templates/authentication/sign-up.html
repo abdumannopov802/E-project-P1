@@ -1,6 +1,6 @@
 {% load static %}
 <section>
-    <link rel="stylesheet" type="text/css" href="{% static 'css/loginCSS/login.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/login.css' %}">
     <div class="colour"></div>
     <div class="colour"></div>
     <div class="colour"></div>
@@ -12,26 +12,26 @@
         <div class="square" style="--i: 4"></div>
         <div class="container">
             <div class="form">
-                <h2>Sign Up Form</h2>
+                <h2 style="color: green;">Sign Up Form</h2>
                 <form method="post" action="{% url 'signup' %}">
                     {% csrf_token %}
                     <div class="input__box">
-                        <input type="text" name="username" placeholder="Username" required />
+                        <input style="color: black;" type="text" name="username" placeholder="Username" required />
                     </div>
                     <div class="input__box">
-                        <input type="email" name="email" placeholder="Email" required />
+                        <input style="color: black;" type="email" name="email" placeholder="Email" required />
                     </div>
                     <div class="input__box">
-                        <input type="password" name="password1" placeholder="Password" required />
+                        <input style="color: black;" type="password" name="password1" placeholder="Password" required />
                     </div>
                     <div class="input__box">
-                        <input type="password" name="password2" placeholder="Confirm Password" required />
+                        <input style="color: black;" type="password" name="password2" placeholder="Confirm Password" required />
                     </div>
                     <div class="input__box">
-                        <input type="submit" value="Sign Up" />
+                        <input style="color: black;" type="submit" value="Sign Up" />
                     </div>
-                    <p class="forget">
-                        Already have an account? <a href="{% url 'login' %}">Log In</a>
+                    <p style="color: black;" class="forget">
+                        Already have an account? <a style="color: blue;" href="{% url 'login' %}">Log In</a>
                     </p>
                 </form>
             </div>
