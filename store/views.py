@@ -1,12 +1,11 @@
 from django.shortcuts import render, get_object_or_404, get_list_or_404
 from .models import *
-from .forms import *
 from django.core.mail import send_mail
 import logging
-from django.core.validators import validate_email
-from django.core.exceptions import ValidationError
-from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
 
 def checkout(request):
     if request.method == 'GET':
@@ -28,7 +27,6 @@ def checkout(request):
             return render(request, 'checkout.html', {'message_fail': message_fail})
     else:
         return HttpResponseBadRequest("Only GET and POST requests are supported for this endpoint.")
-
 
 def contact(request):
     count=0
@@ -104,7 +102,6 @@ def shop_grid(request):
 def shop_grid_pk(request, pk):
     if request.method == 'GET':
         search_products = get_list_or_404(Product, category=pk)
-        products = Product.objects.all()
         categories = Category.objects.all()
         user_cart_items = OrderItem.objects.filter(order__customer=request.user.customer, order__complete=False)
         total_sum = sum(item.get_total for item in user_cart_items)
@@ -122,12 +119,12 @@ def shopping_cart(request):
         context = {'cart_items': None}
     return render(request, 'shoping-cart.html', context)
 
+def remove_from_cart(request, pk):
+    item = get_object_or_404(OrderItem, id=pk)
+    item.delete()
+    return redirect('shopping-cart')
 
-### Authentication <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
-from django.contrib import messages
-
+# Authentication <<<<<
 def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -167,20 +164,3 @@ def signup_view(request):
 def user_logout(request):
     logout(request)
     return redirect('login')
-
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from .models import Product
-
-def add_to_cart(request, product_id):
-    if request.method == 'POST':
-        quantity = request.POST.get('quantity')
-        product = Product.objects.get(pk=product_id)
-        # Perform your logic to add the product to the cart
-        messages.success(request, 'Product added to cart successfully.')
-    return redirect('product-detail', pk=product_id)
-
-def remove_from_cart(request, pk):
-    item = get_object_or_404(OrderItem, id=pk)
-    item.delete()
-    return redirect('shopping-cart')

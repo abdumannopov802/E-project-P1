@@ -96,12 +96,3 @@ class PurchaseHistory(models.Model):
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
     quantity = models.PositiveIntegerField()
     purchase_date = models.DateField(auto_now_add=True)
-
-###
-def create_customer_for_user(sender, instance, created, **kwargs):
-    if created:
-        Customer.objects.create(user=instance, name=instance.username, email=instance.email)
-
-# Connect the create_customer_for_user function to the User's post_save signal
-models.signals.post_save.connect(create_customer_for_user, sender=User)
-
